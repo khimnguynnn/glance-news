@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: glance
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: glance
+  template:
+    metadata:
+      labels:
+        app: glance
+    spec:
+      containers:
+        - name: glance
+          image: glanceapp/glance
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+            - name: user-css
+              mountPath: /app/assets/user.css
+              subPath: user.css
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: config-volume
+          configMap:
+            name: news-configmaps
+            items:
+              - key: home.yml
+                path: home.yml
+              - key: glance.yml
+                path: glance.yml
+        - name: user-css
+          configMap:
+            name: news-configmaps
+            items:
+              - key: user.css
+                path: user.css
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: glance-service
+spec:
+  selector:
+    app: glance
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
