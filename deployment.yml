@@ -24,6 +24,18 @@ spec:
               subPath: user.css
           ports:
             - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
       volumes:
         - name: config-volume
           configMap:
